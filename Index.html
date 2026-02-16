@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Atlanta People's Bank</title>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #020617; }
+        .animate-in { animation: fadeIn 0.5s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useMemo } = React;
+        
+        // Lucide Icons Mock (Simulating the icons used in the previous version)
+        const Icon = ({ name, size = 20, className = "" }) => {
+            return <span className={`inline-block ${className}`} style={{ width: size, height: size }}>●</span>;
+        };
+
+        const STATUS = { ACTIVE: 'Active', PENDING: 'Pending' };
+        const STORE_ITEMS = [
+            { id: 'item1', name: 'VIP Status', price: 1500, description: 'Gold border profile.' },
+            { id: 'item2', name: 'Priority Support', price: 500, description: 'Skip the support line.' },
+            { id: 'item3', name: 'Private Banker', price: 2500, description: 'High-yield vault access.' },
+            { id: 'item4', name: 'Digital Yacht', price: 50000, description: 'Ultimate status symbol.' },
+        ];
+
+        function App() {
+            const [user, setUser] = useState(null);
+            const [view, setView] = useState('login');
+            const [notification, setNotification] = useState(null);
+            const [users, setUsers] = useState([
+                { id: 'admin1', username: 'admin', password: 'password', role: 'admin', name: 'Alpha One', balance: 999999, accountNumber: 'ADMIN-001', inventory: [], loan: 0 },
+                { id: 'u1', username: 'user1', password: 'password', role: 'user', name: 'John Doe', balance: 1250, accountNumber: '1234567890', inventory: [], loan: 0 }
+            ]);
+
+            const showNotification = (msg, type = 'info') => {
+                setNotification({ msg, type });
+                setTimeout(() => setNotification(null), 3000);
+            };
+
+            const handleLogin = (e) => {
+                e.preventDefault();
+                const u = users.find(x => x.username === e.target.username.value && x.password === e.target.password.value);
+                if (u) { setUser(u); setView('dashboard'); } 
+                else { showNotification("Invalid Login", "error"); }
+            };
+
+            return (
+                <div className="min-h-screen text-slate-100">
+                    <nav className="h-16 bg-slate-900 border-b border-slate-800 flex items-center justify-between px-6">
+                        <div className="flex items-center gap-2">
+                            <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">🏦</div>
+                            <span className="font-black text-xl tracking-tighter">APB BANK</span>
+                        </div>
+                        {user && (
+                            <button onClick={() => setUser(null)} className="text-rose-500 font-bold text-xs uppercase tracking-widest px-4 py-2 border border-rose-500/20 rounded-xl hover:bg-rose-500/10">Logout</button>
+                        )}
+                    </nav>
+
+                    <main className="p-6 max-w-6xl mx-auto">
+                        {!user ? (
+                            <div className="max-w-md mx-auto mt-20 bg-slate-900 p-8 rounded-[2rem] border border-slate-800 shadow-2xl">
+                                <h2 className="text-3xl font-black mb-6 text-center">Access Portal</h2>
+                                <form onSubmit={handleLogin} className="space-y-4">
+                                    <input name="username" placeholder="Username" className="w-full bg-slate-950 border border-slate-800 p-4 rounded-xl outline-none" />
+                                    <input name="password" type="password" placeholder="Key" className="w-full bg-slate-950 border border-slate-800 p-4 rounded-xl outline-none" />
+                                    <button className="w-full bg-indigo-600 p-4 rounded-xl font-black">INITIALIZE</button>
+                                </form>
+                            </div>
+                        ) : (
+                            <div className="animate-in">
+                                <div className="bg-gradient-to-br from-indigo-600 to-indigo-800 p-10 rounded-[2.5rem] shadow-2xl mb-10">
+                                    <p className="text-indigo-200 text-xs font-black uppercase tracking-widest">Liquid Assets</p>
+                                    <h1 className="text-6xl font-black">${user.balance.toLocaleString()}</h1>
+                                    <p className="mt-4 font-mono opacity-60">ACC: {user.accountNumber}</p>
+                                </div>
+                                
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div className="bg-slate-900 p-8 rounded-[2rem] border border-slate-800">
+                                        <h3 className="text-xl font-black mb-4 uppercase">APB Store</h3>
+                                        <div className="space-y-3">
+                                            {STORE_ITEMS.map(item => (
+                                                <div key={item.id} className="flex justify-between items-center bg-slate-950 p-4 rounded-xl border border-slate-800">
+                                                    <div>
+                                                        <p className="font-bold">{item.name}</p>
+                                                        <p className="text-[10px] text-slate-500">{item.description}</p>
+                                                    </div>
+                                                    <button className="bg-indigo-600/20 text-indigo-400 px-4 py-2 rounded-lg text-xs font-black hover:bg-indigo-600 hover:text-white transition-all">
+                                                        ${item.price}
+                                                    </button>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    <div className="bg-slate-900 p-8 rounded-[2rem] border border-slate-800">
+                                        <h3 className="text-xl font-black mb-4 uppercase">System Alerts</h3>
+                                        <p className="text-slate-500 italic text-sm">No new alerts from the central clerk.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </main>
+
+                    {notification && (
+                        <div className="fixed bottom-6 right-6 bg-indigo-600 p-4 rounded-xl shadow-2xl font-bold animate-in">
+                            {notification.msg}
+                        </div>
+                    )}
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
